@@ -13,35 +13,47 @@
   </head>
 
   <body>
+    <input type="button" id="addTurret" value="Add Turret" />
+    <br />
+    <input type="button" id="exportMap" value="Export Map" />
+    <br />
+    <input type="button" id="toggleGrid" value="Toggle Grid" />
+    <br />
+    <!-- this is the enemy setup area -->
+    <canvas id="enemySetup" width="1280" height="300" style="border: 1px solid black;"></canvas>
+
     <!-- Options are populated at run time by javasript -->
     <div id="options"></div>
     <input type="button" id="start" value="Start!" />
     <br />
 
     <!-- this is the gameplay area -->
-    <canvas id="gamespace" width="1280" height="720" style="border: 1px solid black;"></canvas>
+    <canvas id="gamespace" width="1280" height="300" style="border: 1px solid black;"></canvas>
 
     <script>
+      var enemySetupCanvas = new fabric.Canvas('enemySetup');
+      var enemyBoard = new EnemyBoard(enemySetupCanvas);
+
       var canvas = new fabric.StaticCanvas('gamespace');
       var game;
 
       var options = [
-        {name: 'Energy Reserve', min: 1000, max: 20000, increment: 1000, default: 10000,
-          linCost: 0.02, expCost: 1.3, weightCost: 0.06},
-        {name: 'Firing Rate', min: 2, max: 30, increment: 2, default: 12,
-          linCost: 3, expCost: 1.6, weightCost: 20},
-        {name: 'Bullet Mass', min: 1, max: 25, increment: 1, default: 4,
-          linCost: 5, expCost: 1.6, weightCost: 50},
-        {name: 'Bullet Energy', min: 200, max: 5000, increment: 100, default: 1000,
-          linCost: 0.02, expCost: 1.5, weightCost: 0.2},
-        {name: 'Ship Thrust', min: 5000, max: 20000, increment: 1000, default: 10000,
-          linCost: 0.002, expCost: 2, weightCost: 0.05},
-        {name: 'Inertial Negator', min: 0, max: 2, increment: 0.1, default: 0.2,
-          linCost: 20, expCost: 2, weightCost: 800},
-        {name: 'Shield Strength', min: 200, max: 5000, increment: 100, default: 1000,
-          linCost: 0.02, expCost: 1.7, weightCost: 0.5},
-        {name: 'Asteroids', min: 1, max: 300, increment: 1, default: 30,
-          linCost: 0, expCost: 1, weightCost: 0},
+        //{name: 'Energy Reserve', min: 1000, max: 20000, increment: 1000, default: 10000,
+        //  linCost: 0.02, expCost: 1.3, weightCost: 0.06},
+        //{name: 'Firing Rate', min: 2, max: 30, increment: 2, default: 12,
+        //  linCost: 3, expCost: 1.6, weightCost: 20},
+        //{name: 'Bullet Mass', min: 1, max: 25, increment: 1, default: 4,
+        //  linCost: 5, expCost: 1.6, weightCost: 50},
+        //{name: 'Bullet Energy', min: 200, max: 5000, increment: 100, default: 1000,
+        //  linCost: 0.02, expCost: 1.5, weightCost: 0.2},
+        //{name: 'Ship Thrust', min: 5000, max: 20000, increment: 1000, default: 10000,
+        //  linCost: 0.002, expCost: 2, weightCost: 0.05},
+        //{name: 'Inertial Negator', min: 0, max: 2, increment: 0.1, default: 0.2,
+        //  linCost: 20, expCost: 2, weightCost: 800},
+        //{name: 'Shield Strength', min: 200, max: 5000, increment: 100, default: 1000,
+        //  linCost: 0.02, expCost: 1.7, weightCost: 0.5},
+        //{name: 'Asteroids', min: 1, max: 300, increment: 1, default: 30,
+        //  linCost: 0, expCost: 1, weightCost: 0},
       ]
 
       var optionDiv = document.getElementById('options');
@@ -69,8 +81,9 @@
       $( '#start' ).click(function() {
         if(game) {
           game.stop();
+        } else {
+          game = new Game(canvas);
         }
-        game = new Game(canvas);
         console.log('Starting game!');
         var opts = {};
         var mass = 1000;
@@ -86,10 +99,22 @@
         opts['ship_mass'] = mass;
         console.log('Cost: ' + cost);
         console.log('Mass: ' + mass);
+        opts.gameLayout = enemyBoard.exportMap();
         game.run(opts);
 
         $( '#start' ).val('Restart!');
       });
+      $( '#addTurret' ).click(function() {
+        enemyBoard.addTurret();
+      });
+      $( '#exportMap' ).click(function() {
+        var mapExport = enemyBoard.exportMap();
+        console.log(mapExport);
+      });
+      $( '#toggleGrid' ).click(function() {
+        enemyBoard.toggleGrid();
+      });
+
     </script>
   </body>
 </html>
